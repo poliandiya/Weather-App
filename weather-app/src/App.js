@@ -1,24 +1,22 @@
 import React from 'react';
 import { Form } from './components/Form.jsx';
 import { Weather } from './components/Weather.jsx';
+import { getWeather, getImage } from './api.js';
 
 import "weather-icons/css/weather-icons.css";
 import './App.css';
-
-const BASE_URL = 'http://api.openweathermap.org/data/2.5/weather';
-const API_KEY = '3ce3d19e821ae1cfed5238064639d347';
 
 class App extends React.Component {
   state = {
     city: "",
     country: "",
     icon: "",
-    main: undefined,
     temp_celsius: 0,
     temp_max: 0,
     temp_min: 0,
     description: "",
     error: "",
+    image: "",
   };
 
   weatherIcon = {
@@ -31,7 +29,7 @@ class App extends React.Component {
     Clouds: "wi-day-fog",
   };
 
-  getWeatherIcon = (icon, ID) => {
+  getWeatherIcon = (ID) => {
     switch (true) {
       case ID >= 200 && ID <= 232:
         this.setState({ icon: this.weatherIcon.Thunderstorm });
@@ -59,31 +57,32 @@ class App extends React.Component {
     };
   };
 
-  calcCelsius = (temp) => {
-    return Math.floor(temp - 273.15);
-  }
+  calcCelsius = (temp) => Math.floor(temp - 273.15);
 
-  getWeather = async (e) => {
+  loadWeather = async (e) => {
     e.preventDefault();
 
     const city = e.target.elements.city.value;
     const country = e.target.elements.country.value;
 
     if (city && country) {
-      const api_call = await fetch(`${BASE_URL}?q=${city},${country}&appid=${API_KEY}`);
-      const response = await api_call.json();
+      const response = await getWeather(city, country);
+      const img = await getImage(city);
 
-      this.getWeatherIcon(this.weatherIcon, response.weather[0].id)
+      console.log(response);
+      console.log(img);
+
+      this.getWeatherIcon(response.weather[0].id);
 
       this.setState({
         city: `${response.name}, ${response.sys.country}`,
         country: response.sys.country,
-        main: response.weather[0].main,
         temp_celsius: this.calcCelsius(response.main.temp),
         temp_max: this.calcCelsius(response.main.temp_max),
         temp_min: this.calcCelsius(response.main.temp_min),
         description: response.weather[0].description,
         error: false,
+        image: img.results[0].urls.raw,
       });
     } else {
       this.setState({ error: true });
@@ -91,11 +90,11 @@ class App extends React.Component {
   }
 
   render() {
-    const { city, temp_celsius, temp_max, temp_min, description, icon, error } = this.state;
+    const { city, temp_celsius, temp_max, temp_min, description, icon, error, image } = this.state;
     return (
       <div className="App">
         <Form
-          loadWeather={this.getWeather}
+          loadWeather={this.loadWeather}
           error={error}
         />
         <Weather
@@ -106,6 +105,7 @@ class App extends React.Component {
           description={description}
           weatherIcon={icon}
         />
+        <img className="app__image" src={image} alt="" />
       </div>
     );
   }
