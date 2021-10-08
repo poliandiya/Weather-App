@@ -1,13 +1,15 @@
 import React from 'react';
+import './Form.css';
+
 
 export const Form = (props) => {
   return (
     <div className="Form">
-      <form onSubmit={props.loadWeather}>
-        <div>{props.error ? error() : ""}</div>
+      <div>{props.error ? error() : ""}</div>
+      <form onSubmit={props.loadWeather} className="d-flex">
         <input type="text" className="form-control" name="city" autoComplete="off" placeholder="City" />
         <input type="text" className="form-control" name="country" autoComplete="off" placeholder="Country" />
-        <button type="submit" className="btn">Get Weather</button>
+        <button type="submit" className="btn btn-warning">Get Weather</button>
       </form>
     </div>
   );

@@ -3,6 +3,7 @@ import { Form } from './components/Form.jsx';
 import { Weather } from './components/Weather.jsx';
 import { getWeather, getImage } from './api.js';
 
+import 'bootstrap/dist/css/bootstrap.min.css';
 import "weather-icons/css/weather-icons.css";
 import './App.css';
 
@@ -66,7 +67,7 @@ class App extends React.Component {
     const country = e.target.elements.country.value;
 
     if (city && country) {
-      const response = await getWeather(city, country);
+      const response = await getWeather(city.toLowerCase(), country.toLowerCase());
       const img = await getImage(city);
 
       console.log(response);
@@ -105,7 +106,9 @@ class App extends React.Component {
           description={description}
           weatherIcon={icon}
         />
-        <img className="app__image" src={image} alt="" />
+        {city &&
+          <img className="app__image" src={image} alt={`${city} img`} />
+        }
       </div>
     );
   }
